@@ -85,9 +85,7 @@ app.use(
   createProxyMiddleware({
     target: BOOK_SERVICE_URL,
     changeOrigin: true,
-    pathRewrite: {
-      '^/api/books': '/books'
-    },
+    pathRewrite: (path) => '/books' + (path === '/' ? '' : path),
     onError: handleProxyError('Book Catalog Service'),
     logLevel: 'info'
   })
@@ -99,9 +97,7 @@ app.use(
   createProxyMiddleware({
     target: MEMBER_SERVICE_URL,
     changeOrigin: true,
-    pathRewrite: {
-      '^/api/members': '/members'
-    },
+    pathRewrite: (path) => '/members' + (path === '/' ? '' : path),
     onError: handleProxyError('Member Service'),
     logLevel: 'info'
   })
@@ -113,9 +109,7 @@ app.use(
   createProxyMiddleware({
     target: MEMBER_SERVICE_URL,
     changeOrigin: true,
-    pathRewrite: {
-      '^/api/borrowings': '/borrowings'
-    },
+    pathRewrite: (path) => '/borrowings' + (path === '/' ? '' : path),
     onError: handleProxyError('Borrowing Service'),
     logLevel: 'info'
   })
