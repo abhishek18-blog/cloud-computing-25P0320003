@@ -4,15 +4,9 @@
 
 class ApiClient {
   constructor() {
-    let savedGateway = localStorage.getItem('libcloud_gateway_url');
-    // If stale localhost is saved in localStorage while on cloud, clear it
-    if (savedGateway && savedGateway.includes('localhost') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      localStorage.removeItem('libcloud_gateway_url');
-      savedGateway = null;
-    }
-    // Default to relative '/api' proxy so it works on any Cloud IP or local port automatically
-    this.baseUrl = savedGateway || '/api';
-    this.gatewayRoot = this.baseUrl.replace(/\/api$/, '');
+    // Strictly use relative /api proxy on cloud and local
+    this.baseUrl = '/api';
+    this.gatewayRoot = '';
   }
 
   setBaseUrl(url) {
@@ -22,11 +16,9 @@ class ApiClient {
     }
     this.baseUrl = cleanUrl;
     this.gatewayRoot = this.baseUrl.replace(/\/api$/, '');
-    localStorage.setItem('libcloud_gateway_url', this.baseUrl);
   }
 
   resetBaseUrl() {
-    localStorage.removeItem('libcloud_gateway_url');
     this.baseUrl = '/api';
     this.gatewayRoot = '';
   }
