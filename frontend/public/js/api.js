@@ -4,15 +4,20 @@
 
 class ApiClient {
   constructor() {
-    const savedGateway = localStorage.getItem('libcloud_gateway_url');
-    // Default to relative '/api' if hosted behind nginx reverse proxy, else fallback to port 8080
-    this.baseUrl = savedGateway || (window.location.port === '3000' || window.location.port === '80' ? '/api' : 'http://localhost:8080/api');
+    let savedGateway = localStorage.getItem('libcloud_gateway_url');
+    // If stale localhost is saved in localStorage while on cloud, clear it
+    if (savedGateway && savedGateway.includes('localhost') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      localStorage.removeItem('libcloud_gateway_url');
+      savedGateway = null;
+    }
+    // Default to relative '/api' proxy so it works on any Cloud IP or local port automatically
+    this.baseUrl = savedGateway || '/api';
     this.gatewayRoot = this.baseUrl.replace(/\/api$/, '');
   }
 
   setBaseUrl(url) {
     let cleanUrl = url.trim().replace(/\/+$/, '');
-    if (!cleanUrl.endsWith('/api')) {
+    if (!cleanUrl.endsWith('/api') && !cleanUrl.includes('/api')) {
       cleanUrl += '/api';
     }
     this.baseUrl = cleanUrl;
@@ -22,8 +27,8 @@ class ApiClient {
 
   resetBaseUrl() {
     localStorage.removeItem('libcloud_gateway_url');
-    this.baseUrl = (window.location.port === '3000' || window.location.port === '80' ? '/api' : 'http://localhost:8080/api');
-    this.gatewayRoot = this.baseUrl.replace(/\/api$/, '');
+    this.baseUrl = '/api';
+    this.gatewayRoot = '';
   }
 
   async request(endpoint, options = {}) {
@@ -62,7 +67,7 @@ class ApiClient {
 
   // Health check on Gateway
   async getHealth() {
-    const healthUrl = `${this.gatewayRoot}/health`;
+    const healthUrl = (this.gatewayRoot && this.gatewayRoot !== '') ? `${this.gatewayRoot}/health` : '/gateway/health';
     const response = await fetch(healthUrl);
     return await response.json();
   }
