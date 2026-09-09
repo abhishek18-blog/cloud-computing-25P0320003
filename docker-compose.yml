@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # VM 1: FRONTEND UI & API GATEWAY
+  # -------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: library-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - library-net
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: library-api-gateway
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      NODE_ENV: production
+      BOOK_SERVICE_URL: http://book-service:8001
+      MEMBER_SERVICE_URL: http://member-borrow-service:8002
+    ports:
+      - "8080:8080"
+    depends_on:
+      book-service:
+        condition: service_healthy
+      member-borrow-service:
+        condition: service_healthy
+    networks:
+      - library-net
+
+  # -------------------------------------------------------------
+  # VM 2: BOOK CATALOG SERVICE (Python FastAPI + PostgreSQL)
+  # -------------------------------------------------------------
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: library-postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-library_books_db}
+      POSTGRES_USER: ${POSTGRES_USER:-libuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-libpass_secure_123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./book-service/init_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-libuser} -d ${POSTGRES_DB:-library_books_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - library-net
+
+  book-service:
+    build:
+      context: ./book-service
+      dockerfile: Dockerfile
+    container_name: library-book-service
+    restart: unless-stopped
+    environment:
+      PORT: 8001
+      APP_ENV: production
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-library_books_db}
+      DB_USER: ${POSTGRES_USER:-libuser}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-libpass_secure_123}
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - library-net
+
+  # -------------------------------------------------------------
+  # VM 3: MEMBER & BORROWING SERVICE (Node.js + MySQL)
+  # -------------------------------------------------------------
+  mysql-db:
+    image: mysql:8.0
+    container_name: library-mysql-db
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass_secure_123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-library_members_db}
+      MYSQL_USER: ${MYSQL_USER:-libmemberuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-memberpass_secure_123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./member-borrow-service/init_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u ${MYSQL_USER:-libmemberuser} -p${MYSQL_PASSWORD:-memberpass_secure_123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - library-net
+
+  member-borrow-service:
+    build:
+      context: ./member-borrow-service
+      dockerfile: Dockerfile
+    container_name: library-member-service
+    restart: unless-stopped
+    environment:
+      PORT: 8002
+      NODE_ENV: production
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-library_members_db}
+      DB_USER: ${MYSQL_USER:-libmemberuser}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-memberpass_secure_123}
+      BOOK_SERVICE_URL: http://book-service:8001
+    ports:
+      - "8002:8002"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - library-net
+
+volumes:
+  postgres_data:
+  mysql_data:
+
+networks:
+  library-net:
+    driver: bridge

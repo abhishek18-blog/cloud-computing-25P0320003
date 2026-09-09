@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Cloud - Microservices Management Portal</title>
+  <meta name="description" content="Cloud-Native Library Management System with Microservices Architecture, Polyglot Persistence and API Gateway">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>LibCloud</h2>
+          <span>Microservices Portal</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="catalog-tab" id="nav-catalog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          <span>Book Catalog</span>
+        </button>
+
+        <button class="nav-item" data-tab="members-tab" id="nav-members">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Members</span>
+        </button>
+
+        <button class="nav-item" data-tab="borrow-tab" id="nav-borrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span>Issue & Return Desk</span>
+        </button>
+
+        <button class="nav-item" data-tab="topology-tab" id="nav-topology">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+          <span>Cloud Topology & Health</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="gateway-status-pill" id="gateway-status-badge">
+          <span class="status-dot pulsing"></span>
+          <span id="gateway-status-text">Checking Gateway...</span>
+        </div>
+        <button class="btn-config" id="btn-open-config" title="Configure API Gateway URL">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          Gateway URL
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Digital Book Catalog</h1>
+          <p id="page-subtitle">Browse books, track inventory, and filter across subjects</p>
+        </div>
+        <div class="header-right">
+          <div class="stats-summary" id="stats-summary">
+            <div class="stat-badge">
+              <span class="stat-label">Total Books:</span>
+              <span class="stat-val" id="stat-total-books">0</span>
+            </div>
+            <div class="stat-badge">
+              <span class="stat-label">Members:</span>
+              <span class="stat-val" id="stat-total-members">0</span>
+            </div>
+            <div class="stat-badge highlight">
+              <span class="stat-label">Active Loans:</span>
+              <span class="stat-val" id="stat-active-loans">0</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB 1: CATALOG -->
+      <section class="tab-pane active" id="catalog-tab">
+        <div class="action-bar">
+          <div class="search-filter-group">
+            <div class="search-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="book-search-input" placeholder="Search by title, author, or ISBN...">
+            </div>
+            <select id="book-category-filter" class="custom-select">
+              <option value="">All Categories</option>
+            </select>
+            <label class="checkbox-container">
+              <input type="checkbox" id="book-available-filter">
+              <span class="checkmark"></span>
+              Available Only
+            </label>
+          </div>
+          <button class="btn btn-primary" id="btn-open-add-book">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Book
+          </button>
+        </div>
+
+        <div class="grid-cards" id="books-grid">
+          <!-- Book cards loaded dynamically -->
+          <div class="loading-spinner-wrapper">
+            <div class="spinner"></div>
+            <p>Loading Book Catalog from PostgreSQL...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: MEMBERS -->
+      <section class="tab-pane" id="members-tab">
+        <div class="action-bar">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="member-search-input" placeholder="Search members by name, email, or phone...">
+          </div>
+          <button class="btn btn-primary" id="btn-open-add-member">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            Register Member
+          </button>
+        </div>
+
+        <div class="grid-cards" id="members-grid">
+          <!-- Member cards loaded dynamically -->
+        </div>
+      </section>
+
+      <!-- TAB 3: BORROW & RETURN DESK -->
+      <section class="tab-pane" id="borrow-tab">
+        <div class="desk-container">
+          <!-- Quick Issue Form -->
+          <div class="desk-card issue-card">
+            <div class="card-header">
+              <h3>Issue / Borrow Book</h3>
+              <span class="badge badge-accent">Inter-Service Transaction</span>
+            </div>
+            <form id="form-issue-book" class="desk-form">
+              <div class="form-group">
+                <label for="issue-member-select">Select Member (MySQL):</label>
+                <select id="issue-member-select" required class="custom-select">
+                  <option value="">-- Choose Member --</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="issue-book-select">Select Book (PostgreSQL):</label>
+                <select id="issue-book-select" required class="custom-select">
+                  <option value="">-- Choose Book --</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="issue-notes">Notes / Purpose (Optional):</label>
+                <input type="text" id="issue-notes" placeholder="e.g. Semester project reference">
+              </div>
+
+              <button type="submit" class="btn btn-success full-width" id="btn-issue-submit">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Confirm & Issue Book
+              </button>
+            </form>
+          </div>
+
+          <!-- Borrowing Records Table -->
+          <div class="desk-card table-card">
+            <div class="card-header">
+              <h3>Borrowing Records</h3>
+              <div class="filter-pills">
+                <button class="pill active" data-filter="BORROWED" id="filter-borrowed">Active Loans</button>
+                <button class="pill" data-filter="ALL" id="filter-all-loans">All History</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table" id="borrowings-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Borrower</th>
+                    <th>Book ID / Title</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="borrowings-tbody">
+                  <!-- Borrowing rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: TOPOLOGY & HEALTH -->
+      <section class="tab-pane" id="topology-tab">
+        <div class="topology-overview">
+          <div class="topology-header">
+            <h2>Cloud Microservice Topology & VM Architecture</h2>
+            <p>Live health probing and status verification across distributed VMs</p>
+          </div>
+
+          <div class="topology-grid">
+            <!-- Node 1: API Gateway -->
+            <div class="topology-card" id="card-gateway">
+              <div class="topo-card-head">
+                <div class="topo-icon gateway-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h4>API Gateway & Reverse Proxy</h4>
+                  <span class="topo-tag">Node.js Express (Port 8080)</span>
+                </div>
+              </div>
+              <div class="topo-body">
+                <p><strong>Role:</strong> Single entry point, routing & CORS</p>
+                <p><strong>Deployment:</strong> Edge / Gateway VM</p>
+                <div class="topo-status">
+                  <span>Status:</span>
+                  <span class="badge" id="topo-status-gateway">Checking...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Node 2: Book Catalog Service + Postgres -->
+            <div class="topology-card" id="card-book-service">
+              <div class="topo-card-head">
+                <div class="topo-icon python-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4>Book Catalog Microservice</h4>
+                  <span class="topo-tag">Python FastAPI + PostgreSQL</span>
+                </div>
+              </div>
+              <div class="topo-body">
+                <p><strong>Service:</strong> FastAPI (:8001)</p>
+                <p><strong>Database:</strong> PostgreSQL 16 (:5432)</p>
+                <p><strong>Deployment:</strong> Dedicated Cloud VM 2</p>
+                <div class="topo-status">
+                  <span>Status:</span>
+                  <span class="badge" id="topo-status-book">Checking...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Node 3: Member & Borrow Service + MySQL -->
+            <div class="topology-card" id="card-member-service">
+              <div class="topo-card-head">
+                <div class="topo-icon node-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <div>
+                  <h4>Member & Borrow Service</h4>
+                  <span class="topo-tag">Node.js Express + MySQL 8.0</span>
+                </div>
+              </div>
+              <div class="topo-body">
+                <p><strong>Service:</strong> Express (:8002)</p>
+                <p><strong>Database:</strong> MySQL 8.0 (:3306)</p>
+                <p><strong>Deployment:</strong> Dedicated Cloud VM 3</p>
+                <div class="topo-status">
+                  <span>Status:</span>
+                  <span class="badge" id="topo-status-member">Checking...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="health-json-box">
+            <div class="json-box-header">
+              <span>Live Health Diagnostic Output</span>
+              <button class="btn-sm btn-outline" id="btn-refresh-health">Refresh Health</button>
+            </div>
+            <pre id="raw-health-json">Fetching diagnostics...</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: ADD BOOK -->
+  <div class="modal-backdrop" id="modal-add-book">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Add Book to Catalog</h3>
+        <button class="btn-close" id="btn-close-book-modal">&times;</button>
+      </div>
+      <form id="form-add-book">
+        <div class="form-group">
+          <label for="book-title">Book Title *</label>
+          <input type="text" id="book-title" required placeholder="e.g. Distributed Systems 3rd Ed.">
+        </div>
+        <div class="form-group">
+          <label for="book-author">Author(s) *</label>
+          <input type="text" id="book-author" required placeholder="e.g. Maarten van Steen, Andrew S. Tanenbaum">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="book-isbn">ISBN *</label>
+            <input type="text" id="book-isbn" required placeholder="978-XXXXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label for="book-category">Category *</label>
+            <input type="text" id="book-category" required placeholder="e.g. Cloud Computing">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="book-copies">Total Copies</label>
+          <input type="number" id="book-copies" min="1" max="1000" value="5" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-book">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add to PostgreSQL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTER MEMBER -->
+  <div class="modal-backdrop" id="modal-add-member">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Register New Member</h3>
+        <button class="btn-close" id="btn-close-member-modal">&times;</button>
+      </div>
+      <form id="form-add-member">
+        <div class="form-group">
+          <label for="member-name">Full Name *</label>
+          <input type="text" id="member-name" required placeholder="e.g. Rahul Sharma">
+        </div>
+        <div class="form-group">
+          <label for="member-email">University Email *</label>
+          <input type="email" id="member-email" required placeholder="e.g. rahul.s@unigoa.ac.in">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="member-phone">Phone Number</label>
+            <input type="text" id="member-phone" placeholder="+91-9876543210">
+          </div>
+          <div class="form-group">
+            <label for="member-type">Membership Type</label>
+            <select id="member-type" class="custom-select">
+              <option value="STUDENT">Student</option>
+              <option value="FACULTY">Faculty</option>
+              <option value="RESEARCHER">Researcher</option>
+              <option value="STAFF">Staff</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-member">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save to MySQL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GATEWAY CONFIG -->
+  <div class="modal-backdrop" id="modal-config">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Configure API Gateway Endpoint</h3>
+        <button class="btn-close" id="btn-close-config-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Configure the API Gateway base URL when deployed on cloud VMs:</p>
+        <div class="form-group">
+          <label for="input-gateway-url">Gateway Base URL:</label>
+          <input type="text" id="input-gateway-url" placeholder="http://localhost:8080">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-reset-gateway">Reset Default</button>
+        <button type="button" class="btn btn-primary" id="btn-save-gateway">Save & Reconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

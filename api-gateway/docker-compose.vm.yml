@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: library-api-gateway
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      NODE_ENV: production
+      BOOK_SERVICE_URL: ${BOOK_SERVICE_URL:-http://book-service-vm-ip:8001}
+      MEMBER_SERVICE_URL: ${MEMBER_SERVICE_URL:-http://member-service-vm-ip:8002}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: library-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway

@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: library-mysql-db
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass_secure_123}
+      MYSQL_DATABASE: ${DB_NAME:-library_members_db}
+      MYSQL_USER: ${DB_USER:-libmemberuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-memberpass_secure_123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u ${DB_USER:-libmemberuser} -p${DB_PASSWORD:-memberpass_secure_123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  member-borrow-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: library-member-service
+    restart: unless-stopped
+    environment:
+      PORT: ${PORT:-8002}
+      NODE_ENV: ${NODE_ENV:-production}
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-library_members_db}
+      DB_USER: ${DB_USER:-libmemberuser}
+      DB_PASSWORD: ${DB_PASSWORD:-memberpass_secure_123}
+      BOOK_SERVICE_URL: ${BOOK_SERVICE_URL:-http://book-service-vm-ip:8001}
+    ports:
+      - "8002:8002"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
